@@ -1,8 +1,8 @@
 <tr>
-  <th>Description</th>
-  <th>Quantité</th>
-  <th>Prix Unitaire H.T.</th>
-  <th>Total H.T.</th>
+  <th><%= t('Description') %> </th>
+  <th><%= t('Quantity') %></th>
+  <th><%= t('Unit price without tax') %></th>
+  <th><%= t('Total ex. tax') %></th>
 </tr>
 
 <% rent.preTaxAmounts.forEach(function(preTaxAmount) { %>

@@ -1,34 +1,34 @@
 <tr>
   <td colspan="1" class="blank"> </td>
-  <td colspan="2" class="total-line">Sous total H.T.</td>
+  <td colspan="2" class="total-line"><%= t('Subtotal ex. tax') %></td>
   <td class="total-value"><div class="subtotal"><%= formatMoney(rent.total.subTotal) %></div></td>
 </tr>
 <% if (rent.vats.length) { %>
 <tr>
   <td colspan="1" class="blank"> </td>
-  <td colspan="2" class="total-line">TVA <%= formatPercent(rent.vats[0].rate) %></td>
+  <td colspan="2" class="total-line"><%= t('VAT') %> <%= formatPercent(rent.vats[0].rate) %></td>
   <td class="total-value"><div class="subtotal"><%= formatMoney(rent.total.vat) %></div></td>
 </tr>
 <% } %>
 <tr>
   <td colspan="1" class="blank"> </td>
-  <td colspan="2" class="total-line">Solde antérieur</td>
+  <td colspan="2" class="total-line"><%= t('Previous balance') %></td>
   <td class="total-value"><div class="subtotal"><%= formatMoney(rent.total.balance) %></div></td>
 </tr>
 <tr>
   <td colspan="1" class="blank"> </td>
-  <td colspan="2" class="total-line">Total T.T.C.</td>
+  <td colspan="2" class="total-line"><%= t('Total') %></td>
   <td class="total-value"><div class="total"><%= formatMoney(rent.total.grandTotal) %></div></td>
 </tr>
 
 <tr>
   <td colspan="1" class="blank"> </td>
-  <td colspan="2" class="total-line">Montant payé</td>
+  <td colspan="2" class="total-line"><%= t('Amount paid') %></td>
   <td class="total-value"><div class="total"><%= formatMoney(rent.total.payment) %></div></td>
 </tr>
 
 <tr>
   <td colspan="1" class="blank"> </td>
-  <td colspan="2" class="total-line balance"><%= rent.total.newBalance < 0 ? "Solde en votre faveur" : "Montant restant à payer" %></td>
+  <td colspan="2" class="total-line balance"><%= rent.total.newBalance < 0 ? t('Balance in favour') : t('Remaining amount to be paid') %></td>
   <td class="total-value balance"><div class="due"><%= formatMoney(Math.abs(rent.total.newBalance)) %></div></td>
 </tr>
