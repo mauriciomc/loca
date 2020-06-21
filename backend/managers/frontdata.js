@@ -10,7 +10,7 @@ function toRentData(inputRent, inputOccupant, emailStatus) {
         month: rent.month,
         year: rent.year,
         balance: rent.total.balance,
-        newBalance:  rent.total.payment - rent.total.grandTotal,
+        newBalance: rent.total.payment - rent.total.grandTotal,
         payment: rent.total.payment || 0,
         discount: rent.total.discount,
         totalAmount: rent.total.grandTotal,
@@ -26,74 +26,74 @@ function toRentData(inputRent, inputOccupant, emailStatus) {
     Object.assign(
         rentToReturn,
         rent.payments
-            .reduce((acc, payment) => {
-                return {
-                    paymentType: payment.type,
-                    paymentReference: payment.reference,
-                    paymentDate: payment.date,
-                };
-            }, {
-                paymentType: '',
-                paymentReference: '',
-                paymentDate: ''
-            })
+        .reduce((acc, payment) => {
+            return {
+                paymentType: payment.type,
+                paymentReference: payment.reference,
+                paymentDate: payment.date,
+            };
+        }, {
+            paymentType: '',
+            paymentReference: '',
+            paymentDate: ''
+        })
     );
 
     Object.assign(
         rentToReturn,
         rent.discounts
-            .filter(discount => discount.origin === 'settlement')
-            .reduce((acc, discount) => {
-                return {
-                    promo: acc.promo + discount.amount,
-                    notepromo: `${acc.notepromo}${discount.description}\n`
-                };
-            }, {promo:0, notepromo:''})
+        .filter(discount => discount.origin === 'settlement')
+        .reduce((acc, discount) => {
+            return {
+                promo: acc.promo + discount.amount,
+                notepromo: `${acc.notepromo}${discount.description}\n`
+            };
+        }, { promo: 0, notepromo: '' })
     );
 
     Object.assign(
         rentToReturn,
         rent.debts
-            .reduce((acc, debt) => {
-                return {
-                    extracharge: acc.extracharge + debt.amount,
-                    noteextracharge: `${acc.noteextracharge}${debt.description}\n`
-                };
-            }, {extracharge:0, noteextracharge:''})
+        .reduce((acc, debt) => {
+            return {
+                extracharge: acc.extracharge + debt.amount,
+                noteextracharge: `${acc.noteextracharge}${debt.description}\n`
+            };
+        }, { extracharge: 0, noteextracharge: '' })
     );
 
     // Get the first vat rate found in vats.
     const vatRate = (rent.vats && rent.vats.length) ? rent.vats.filter(vat => vat.origin === 'contract')[0].rate : 0;
     if (vatRate) {
         if (rentToReturn.promo > 0) {
-            rentToReturn.promo = Math.round(rentToReturn.promo * ( 1 + vatRate ) * 100) / 100;
+            rentToReturn.promo = Math.round(rentToReturn.promo * (1 + vatRate) * 100) / 100;
         }
 
         if (rentToReturn.extracharge > 0) {
-            rentToReturn.extracharge = Math.round(rentToReturn.extracharge * ( 1 + vatRate ) * 100) / 100;
+            rentToReturn.extracharge = Math.round(rentToReturn.extracharge * (1 + vatRate) * 100) / 100;
         }
     }
 
     Object.assign(
         rentToReturn,
         rent.discounts
-            .filter(discount => discount.origin === 'contract')
-            .reduce((acc, discount) => {
-                return {
-                    totalWithoutVatAmount:  acc.totalWithoutVatAmount - discount.amount
-                };
-            }, {totalWithoutVatAmount: rent.total.preTaxAmount + rent.total.charges})
+        .filter(discount => discount.origin === 'contract')
+        .reduce((acc, discount) => {
+            return {
+                totalWithoutVatAmount: acc.totalWithoutVatAmount - discount.amount
+            };
+        }, { totalWithoutVatAmount: rent.total.preTaxAmount + rent.total.charges })
     );
 
     Object.assign(
         rentToReturn,
         rent.vats
-            .filter(vat => vat.origin === 'contract')
-            .reduce((acc, vat) => {
-                return {
-                    vatAmount:  acc.vatAmount + vat.amount
-                };
-            }, {vatAmount: 0})
+        .filter(vat => vat.origin === 'contract')
+        .reduce((acc, vat) => {
+            return {
+                vatAmount: acc.vatAmount + vat.amount
+            };
+        }, { vatAmount: 0 })
     );
 
     // payment status
@@ -135,7 +135,7 @@ function toRentData(inputRent, inputOccupant, emailStatus) {
             if (emailStatus.rentcall_reminder && emailStatus.rentcall_reminder.length) {
                 const lastRentCallReminder = emailStatus.rentcall_reminder[0];
                 if (computedEmailStatus.last.rentcall) {
-                    if (moment(computedEmailStatus.last.rentcall.sentDate).isBefore(moment(lastRentCallReminder.sentDate))){
+                    if (moment(computedEmailStatus.last.rentcall.sentDate).isBefore(moment(lastRentCallReminder.sentDate))) {
                         computedEmailStatus.last.rentcall = lastRentCallReminder;
                     }
                 } else {
@@ -143,14 +143,13 @@ function toRentData(inputRent, inputOccupant, emailStatus) {
                 }
             }
 
-            Object.assign(rentToReturn, {emailStatus: computedEmailStatus});
+            Object.assign(rentToReturn, { emailStatus: computedEmailStatus });
         }
 
         const occupant = toOccupantData(inputOccupant);
 
         Object.assign(
-            rentToReturn,
-            {
+            rentToReturn, {
                 _id: occupant._id,
                 occupant: occupant,
                 vatRatio: occupant.vatRatio,
@@ -169,7 +168,7 @@ function toRentData(inputRent, inputOccupant, emailStatus) {
                     }
 
                     const { grandTotal, payment } = currentRent.total;
-                    const newBalance =  payment - grandTotal;
+                    const newBalance = payment - grandTotal;
 
                     if (grandTotal <= 0 || newBalance >= 0) {
                         endCounting = true;
@@ -220,25 +219,25 @@ function toPrintData(realm, doc, fromMonth, month, year, occupants) {
         occupants: occupants.map(occupant => {
             const data = toOccupantData(occupant);
             data.rents = occupant.rents
-                .filter(rent => terms.indexOf(rent.term) !== -1 )
+                .filter(rent => terms.indexOf(rent.term) !== -1)
                 .map(rent => {
                     const momentTerm = moment(rent.term, 'YYYYMMDDHH');
                     const dueDate = moment(momentTerm).add(10, 'days');
                     const dueDay = dueDate.isoWeekday();
                     let today = momentToday;
 
-                    if ( dueDay === 6 ) {
+                    if (dueDay === 6) {
                         dueDate.subtract(1, 'days');
-                    } else if ( dueDay === 7 ) {
+                    } else if (dueDay === 7) {
                         dueDate.add(1, 'days');
                     }
 
                     if (dueDate.isSameOrBefore(momentToday)) {
                         today = moment(momentTerm);
                         const day = today.isoWeekday();
-                        if ( day === 6 ) {
+                        if (day === 6) {
                             today.subtract(1, 'days');
-                        } else if ( day === 7 ) {
+                        } else if (day === 7) {
                             today.add(1, 'days');
                         }
                     }
@@ -246,10 +245,10 @@ function toPrintData(realm, doc, fromMonth, month, year, occupants) {
                     rent.today = today.format('LL');
                     rent.dueDate = dueDate.format('LL');
                     rent.callDate = moment(`20/${rent.month}/${year}`, 'DD/MM/YYYY').subtract(1, 'months').format('LL'),
-                    rent.invoiceDate = moment(`20/${rent.month}/${year}`, 'DD/MM/YYYY').format('LL'),
-                    rent.period = moment(`01/${rent.month}/${year}`, 'DD/MM/YYYY').format('MMMM YYYY'),
-                    rent.billingReference = `${momentTerm.format('MM_YY_')}${occupant.reference}`,
-                    rent.total.payment = rent.total.payment || 0;
+                        rent.invoiceDate = moment(`20/${rent.month}/${year}`, 'DD/MM/YYYY').format('LL'),
+                        rent.period = moment(`01/${rent.month}/${year}`, 'DD/MM/YYYY').format('MMMM YYYY'),
+                        rent.billingReference = `${momentTerm.format('MM_YY_')}${occupant.reference}`,
+                        rent.total.payment = rent.total.payment || 0;
                     rent.total.subTotal = rent.total.preTaxAmount + rent.total.debts + rent.total.charges - rent.total.discount;
                     rent.total.newBalance = rent.total.grandTotal - rent.total.payment;
                     return rent;
@@ -290,8 +289,7 @@ function toOccupantData(inputOccupant) {
 
     // set default values for occupant
     Object.assign(
-        occupant,
-        {
+        occupant, {
             street1: occupant.street1 || '',
             street2: occupant.street2 || '',
             zipCode: occupant.zipCode || '',
@@ -363,7 +361,7 @@ function toAccountingData(year, inputOccupants) {
             const beginMoment = moment(occupant.beginDate, 'DD/MM/YYYY');
             const endMoment = moment(occupant.terminationDate || occupant.endDate, 'DD/MM/YYYY');
             return beginMoment.isBetween(beginOfYear, endOfYear, 'day', '[]') ||
-                endMoment.isBetween(beginOfYear, endOfYear, 'day', '[]')   ||
+                endMoment.isBetween(beginOfYear, endOfYear, 'day', '[]') ||
                 (beginMoment.isSameOrBefore(beginOfYear) && endMoment.isSameOrAfter(endOfYear));
         });
 
@@ -376,7 +374,7 @@ function toAccountingData(year, inputOccupants) {
                     occupantId: occupant._id,
                     name: occupant.name,
                     reference: occupant.reference,
-                    properties: occupant.properties.map((p) => { return {name: p.property.name, type: p.property.type};}),
+                    properties: occupant.properties.map((p) => { return { name: p.property.name, type: p.property.type }; }),
                     beginDate: occupant.beginDate,
                     endDate: occupant.terminationDate || occupant.endDate,
                     deposit: occupant.guaranty,
@@ -386,7 +384,7 @@ function toAccountingData(year, inputOccupants) {
                             currentRent = toRentData(currentRent);
                             currentRent.occupantId = occupant._id;
                         }
-                        return currentRent || {inactive: true};
+                        return currentRent || { inactive: true };
                     })
                 };
             })
@@ -402,7 +400,7 @@ function toAccountingData(year, inputOccupants) {
                         return {
                             name: occupant.name,
                             reference: occupant.reference,
-                            properties: occupant.properties.map((p) => { return {name: p.property.name, type: p.property.type};}),
+                            properties: occupant.properties.map((p) => { return { name: p.property.name, type: p.property.type }; }),
                             beginDate: occupant.beginDate,
                             deposit: occupant.guaranty
                         };
@@ -422,19 +420,19 @@ function toAccountingData(year, inputOccupants) {
                             })
                             .reduce((acc, rent) => {
                                 let balance = rent.total.grandTotal - rent.total.payment;
-                                return balance!==0?balance*-1:balance;
+                                return balance !== 0 ? balance * -1 : balance;
                             }, 0);
 
                         return {
                             name: occupant.name,
                             reference: occupant.reference,
-                            properties: occupant.properties.map((p) => { return {name: p.property.name, type: p.property.type};}),
-                            leaseBroken: occupant.terminationDate && occupant.terminationDate!==occupant.endDate,
+                            properties: occupant.properties.map((p) => { return { name: p.property.name, type: p.property.type }; }),
+                            leaseBroken: occupant.terminationDate && occupant.terminationDate !== occupant.endDate,
                             endDate: occupant.terminationDate || occupant.endDate,
                             deposit: occupant.guaranty,
                             depositRefund: occupant.guarantyPayback,
                             totalAmount: totalAmount,
-                            toPay: Number(occupant.guarantyPayback?0:occupant.guaranty) + Number(totalAmount)
+                            toPay: Number(occupant.guarantyPayback ? 0 : occupant.guaranty) + Number(totalAmount)
                         };
                     })
             }
@@ -452,6 +450,9 @@ function toProperty(inputProperty, inputOccupant) {
         phone: inputProperty.phone,
         price: inputProperty.price,
         surface: inputProperty.surface,
+        description: inputProperty.description,
+        building: inputProperty.building,
+        level: inputProperty.level,
         expense: inputProperty.expense || 0,
         priceWithExpenses: math.round(inputProperty.price + inputProperty.expense, 2),
         m2Expense: inputProperty.surface ? math.round((inputProperty.expense / inputProperty.surface), 2) : null,
@@ -465,10 +466,9 @@ function toProperty(inputProperty, inputOccupant) {
     };
     if (inputOccupant) {
         Object.assign(
-            property,
-            {
+            property, {
                 beginDate: inputOccupant.entryDate,
-                endDate:  inputOccupant.exitDate,
+                endDate: inputOccupant.exitDate,
                 lastBusyDay: inputOccupant.terminationDate || inputOccupant.endDate,
                 occupantLabel: inputOccupant.name
             }
